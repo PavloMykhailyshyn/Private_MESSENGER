@@ -4,7 +4,8 @@
 #include <QWidget>
 #include <QDesktopWidget>
 #include <QListWidget>
-#include <QtConcurrent/QtConcurrent>
+#include <QMessageBox>
+#include <QDebug>
 #include <sstream>
 #include <boost/thread.hpp>
 #include "clientsocket.h"
@@ -38,15 +39,23 @@ private slots:
 
     void on_AddContact_clicked();
 
+    void on_AllContacts_clicked(const QModelIndex&);
+
+    void on_ChangeState_clicked();
+
+    void on_Refresh_clicked(); // need to implement
+
+    void on_MyContactList_itemClicked(QListWidgetItem *item);
+
+    void on_SEND_clicked();
+
 private:
     Ui::CHAT *ui;
 
-    //enum MSG_TYPE : char { CONTACT_LIST = '3', STATUS = '5', REFRESH = '4' };
+    boost::thread * thread_;
 
-    boost::thread * thread;
-
-    std::string username;
-    std::string password;
+    std::string username_;
+    std::string password_;
 
     void CLIENT_THREAD();
 

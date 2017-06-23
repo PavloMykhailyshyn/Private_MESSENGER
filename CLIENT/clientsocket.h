@@ -15,16 +15,15 @@ class clientsocket
 {
     static clientsocket * instance_;
 
-
-    clientsocket(std::string = localhost_, std::int32_t = port_);
-
-
     static const std::string localhost_; // = "127.0.0.1";
     static const std::int32_t port_ = 1111;
     std::int32_t client_socket_desc_;
     sockaddr_in server_data_;
 
     char buff[BUFF_SIZE] = { 0 };
+
+private:
+    clientsocket(std::string = localhost_, std::int32_t = port_);
 
 public:
     clientsocket(const clientsocket&)               = delete;

@@ -7,13 +7,16 @@
 #define DELIMITER                       '#'
 #define END_OF_STR                      '\n'
 #define SEND_LOGIN_PASS                 '1'
-#define SEND_USERNAME_PASS              '2'
-#define RCV_CONTACT_LIST                '3'
-#define MSG_TO_SMB                      '4'
-#define STATUS_CHANGED                  '5'
-#define REFRESH_CONTACTS                '6'
 #define SUCCESS_LOGIN                   "11"
 #define ALREADY_IN_USE                  "12"
+#define SEND_USERNAME_PASS              '2'
 #define SUCCESS_CREATION_ACC            "21"
+#define RCV_CONTACT_LIST                '3'
+#define MESSAGE                         '4'
+#define MESSAGE_SENT                    "41"
+#define RECEIVER_BUSY                   "42"
+#define RECEIVER_OFFLINE                "40"
+#define RCV_MESSAGE                     '5'
+#define STATUS_CHANGED                  '6'
 
 #endif // COMMON_H

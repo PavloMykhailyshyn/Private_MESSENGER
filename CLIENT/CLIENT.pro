@@ -45,7 +45,7 @@ LIBS += -pthread
 
 INCLUDEPATH += /usr/include/boost
 
-LIBS += -L/usr/include/boost -lboost_system
+LIBS += -L/usr/include/boost  -lboost_system
 LIBS += -L/usr/include/boost  -lboost_chrono
 LIBS += -L/usr/include/boost  -lboost_thread
 LIBS += -L/usr/include/boost  -lboost_timer

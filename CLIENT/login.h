@@ -15,6 +15,7 @@ class LogIn : public QWidget
 
     std::string ip_addr_ = IP_ADDRESS;
     std::int32_t port_ = PORT;
+
 public:
     explicit LogIn(QWidget *parent = 0);
     ~LogIn();
@@ -30,7 +31,7 @@ private:
     Ui::LogIn *ui;
     CHAT *ch;
 
-    bool flag_thread = false;
+    bool flag_thread_ = false;
 };
 
 #endif // LOGIN_H
