@@ -2,10 +2,13 @@
 #include "ui_login.h"
 
 
-LogIn::LogIn(QWidget *parent) : QWidget(parent), ui(new Ui::LogIn), ch(new CHAT)
+LogIn::LogIn(QWidget *parent) : QWidget(parent), ui(new Ui::LogIn)
 {
+    std::cout << "LOGIN created" << std::endl;
+
     ui->setupUi(this);
-    //ch->setAttribute(Qt::WA_DeleteOnClose);
+    ch = new CHAT;
+
     this->setFixedSize(QSize(313, 188));
 
     client_ptr->SetIpv4Addr(ip_addr_);
@@ -20,24 +23,22 @@ LogIn::LogIn(QWidget *parent) : QWidget(parent), ui(new Ui::LogIn), ch(new CHAT)
 
     connect(ui->login, SIGNAL(textChanged(QString)), SLOT(CHECK(QString)));
     connect(ui->password, SIGNAL(textChanged(QString)), SLOT(CHECK(QString)));
-
-    //connect(ch, SIGNAL(destroyed(QObject*)), this, SLOT());
 }
 
 LogIn::~LogIn()
 {
-    client_ptr->clientsocket::ResetInstance();
+    if (flag_thread)
+        ch->THREAD_DELETE();
+    delete ch;
     delete ui;
+    std::cout << "deleted LOGIN" << std::endl;
+    client_ptr->clientsocket::ResetInstance();
 }
 
 void LogIn::on_START_clicked()
 {
-    /*hide();
-    ch->THREAD_CREATE();
-    ch->show();*/
     if (ui->login->text() != "" && ui->password->text() != "")
     {
-        //QString qs = '1' + ui->login->text() + '\t' + ui->password->text();
         QString q_login = ui->login->text();
         QString q_password = ui->password->text();
         std::string login = q_login.toUtf8().constData();
@@ -58,6 +59,7 @@ void LogIn::on_START_clicked()
                 {
                     hide();
                     ch->THREAD_CREATE();
+                    flag_thread = true;
                     ch->SetNameAndPass(login, password);
                     ch->show();
                     close();
@@ -107,6 +109,7 @@ void LogIn::on_CreateAnAcc_clicked()
                 {
                     hide();
                     ch->THREAD_CREATE();
+                    flag_thread = true;
                     ch->SetNameAndPass(username, password);
                     ch->show();
                     close();

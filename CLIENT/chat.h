@@ -4,10 +4,12 @@
 #include <QWidget>
 #include <QDesktopWidget>
 #include <QListWidget>
+#include <QtConcurrent/QtConcurrent>
 #include <sstream>
-#include <pthread.h>
+#include <boost/thread.hpp>
 #include "clientsocket.h"
 #include "common.h"
+
 
 namespace Ui
 {
@@ -26,29 +28,28 @@ public:
     bool ProcessString(char, std::string);
 
     void THREAD_CREATE();
+    void THREAD_DELETE();
 
     void SetNameAndPass(const std::string&, const std::string&);
 
-    /*QListWidget *listWidget_contacts;
-    QListWidget *listWidget_allcontacts;*/
-
 private slots:
+
     void on_GetContactList_clicked();
 
     void on_AddContact_clicked();
 
 private:
     Ui::CHAT *ui;
-    pthread_t thread;
-    static void * ClientThread(void *);
-    enum MSG_TYPE : char { CONTACT_LIST = '3', MSG_TO_GROUP = '2', STATUS_CHANGED = '5', REFRESH = '4' };
 
-    std::string contacts_;
+    //enum MSG_TYPE : char { CONTACT_LIST = '3', STATUS = '5', REFRESH = '4' };
+
+    boost::thread * thread;
+
     std::string username;
     std::string password;
 
-};
+    void CLIENT_THREAD();
 
-static CHAT * chat = nullptr;
+};
 
 #endif // CHAT_H

@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += core
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -40,3 +41,11 @@ FORMS += \
     chat.ui
 
 LIBS += -pthread
+
+
+INCLUDEPATH += /usr/include/boost
+
+LIBS += -L/usr/include/boost -lboost_system
+LIBS += -L/usr/include/boost  -lboost_chrono
+LIBS += -L/usr/include/boost  -lboost_thread
+LIBS += -L/usr/include/boost  -lboost_timer

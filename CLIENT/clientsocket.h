@@ -26,28 +26,11 @@ class clientsocket
 
     char buff[BUFF_SIZE] = { 0 };
 
-    /*bool SendAll(const char *, std::int32_t) const;
-    bool RecvAll(char *, int) const;
-    bool SendInt(std::int32_t) const;
-    bool GetInt(std::int32_t&) const;*/
-
-
 public:
     clientsocket(const clientsocket&)               = delete;
     clientsocket operator = (const clientsocket&)   = delete;
 
-    //enum _PACKET_TYPE_ { MSG = 1, STATE, MSG_TO_ALL, MSG_TO_SMB };
-    //enum _STATE_ { ONLINE = 1, OFFLINE, BUSY };
-
     bool Connect();
-
-    /*bool SendString(const std::string&) const;
-    bool SendMsgToSmb(const std::string&) const;
-    bool SendMsgToAll(const std::string&) const;
-    bool SendState(_STATE_) const;*/
-
-    /*bool SendPacketType(PACKET_TYPE) const;
-    bool GetPacketType(PACKET_TYPE &) const;*/
 
     bool SendString(const std::string&) const;
     bool GetString(std::string&);

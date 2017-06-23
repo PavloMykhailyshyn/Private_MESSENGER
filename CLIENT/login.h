@@ -29,6 +29,8 @@ private slots:
 private:
     Ui::LogIn *ui;
     CHAT *ch;
+
+    bool flag_thread = false;
 };
 
 #endif // LOGIN_H
