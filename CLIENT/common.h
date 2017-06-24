@@ -18,5 +18,6 @@
 #define RECEIVER_OFFLINE                "40"
 #define RCV_MESSAGE                     '5'
 #define STATUS_CHANGED                  '6'
+#define REFRESH_CONTACTS                '7'
 
 #endif // COMMON_H

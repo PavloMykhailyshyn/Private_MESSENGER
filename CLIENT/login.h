@@ -17,10 +17,12 @@ class LogIn : public QWidget
     std::int32_t port_ = PORT;
 
 public:
+
     explicit LogIn(QWidget *parent = 0);
     ~LogIn();
 
 private slots:
+
     void on_START_clicked();
 
     void on_CreateAnAcc_clicked();
@@ -28,6 +30,7 @@ private slots:
     void CHECK(QString);
 
 private:
+
     Ui::LogIn *ui;
     CHAT *ch;
 

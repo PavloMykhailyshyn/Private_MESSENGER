@@ -28,17 +28,20 @@ SOURCES += \
         main.cpp \
         login.cpp \
     chat.cpp \
-    clientsocket.cpp
+    clientsocket.cpp \
+    messagesdlg.cpp
 
 HEADERS += \
         login.h \
     chat.h \
     clientsocket.h \
-    common.h
+    common.h \
+    messagesdlg.h
 
 FORMS += \
         login.ui \
-    chat.ui
+    chat.ui \
+    messagesdlg.ui
 
 LIBS += -pthread
 

@@ -6,10 +6,12 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QDebug>
+#include <QTimer>
 #include <sstream>
 #include <boost/thread.hpp>
 #include "clientsocket.h"
 #include "common.h"
+#include "messagesdlg.h"
 
 
 namespace Ui
@@ -26,8 +28,6 @@ public:
     explicit CHAT(QWidget *parent = 0);
     ~CHAT();
 
-    bool ProcessString(char, std::string);
-
     void THREAD_CREATE();
     void THREAD_DELETE();
 
@@ -43,21 +43,27 @@ private slots:
 
     void on_ChangeState_clicked();
 
-    void on_Refresh_clicked(); // need to implement
+    void on_Refresh_clicked();
 
-    void on_MyContactList_itemClicked(QListWidgetItem *item);
+    void on_MyContactList_itemClicked(QListWidgetItem*);
 
     void on_SEND_clicked();
 
 private:
+
     Ui::CHAT *ui;
 
-    boost::thread * thread_;
+    boost::thread * thread1_;
+    boost::thread * thread2_;
 
     std::string username_;
     std::string password_;
 
     void CLIENT_THREAD();
+    void CLIENT_THREAD_MSG();
+
+    bool ProcessString(char, std::string);
+    void ProcessStringMsg(std::string);
 
 };
 
