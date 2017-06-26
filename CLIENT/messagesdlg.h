@@ -21,9 +21,12 @@ public:
 
     void SetTitleAndText(const QString&, const QString&);
 
+    void Clear();
+
 private:
 
     Ui::MessagesDlg *ui;
+
 };
 
 #endif // MESSAGESDLG_H

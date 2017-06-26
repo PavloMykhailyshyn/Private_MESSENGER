@@ -9,9 +9,12 @@ CHAT::CHAT(QWidget *parent) : QWidget(parent), ui(new Ui::CHAT)
 #endif
     ui->setupUi(this);
 
+    qRegisterMetaType<QTextCursor>("QTextCursor");
+    qRegisterMetaType<QItemSelection>("QItemSelection");
+
     this->move(QApplication::desktop()->screen()->rect().center() - this->rect().center());
 
-    ui->AddContact->setEnabled(false);
+    ui->AllContacts->setSelectionMode(QAbstractItemView::ExtendedSelection);
 }
 
 CHAT::~CHAT()
@@ -24,17 +27,14 @@ CHAT::~CHAT()
 
 void CHAT::THREAD_CREATE()
 {
-    thread1_ = new boost::thread(boost::bind(&CHAT::CLIENT_THREAD, this));
-    thread2_ = new boost::thread(boost::bind(&CHAT::CLIENT_THREAD_MSG, this));
+    thread_ = new boost::thread(boost::bind(&CHAT::CLIENT_THREAD, this));
 }
 
 void CHAT::THREAD_DELETE()
 {
-    delete thread1_;
-    delete thread2_;
+    delete thread_;
 #ifdef QT_DEBUG
-    std::cout << "deleted Thread1" << std::endl;
-    std::cout << "deleted Thread2" << std::endl;
+    std::cout << "deleted Thread" << std::endl;
 #endif
 }
 
@@ -55,17 +55,14 @@ bool CHAT::ProcessString(char symbol, std::string str)
             case 'o':
                 username_and_state.erase(username_and_state.end() - 2, username_and_state.end());
                 username_and_state += "\n| online  |\n";
-                username_and_state = "  " + username_and_state;
                 break;
             case 'f':
                 username_and_state.erase(username_and_state.end() - 2, username_and_state.end());
                 username_and_state += "\n| offline |\n";
-                username_and_state = "  " + username_and_state;
                 break;
             case 'b':
                 username_and_state.erase(username_and_state.end() - 2, username_and_state.end());
                 username_and_state += "\n| busy     |\n";
-                username_and_state = "  " + username_and_state;
                 break;
             }
             contacts += QString::fromUtf8(username_and_state.c_str());
@@ -80,9 +77,12 @@ bool CHAT::ProcessString(char symbol, std::string str)
         std::string response;
         response.push_back(str[0]);
         response.push_back(str[1]);
+#ifdef QT_DEBUG
+        std::cout << response << std::endl;
+#endif
         if(response == RECEIVER_BUSY)
         {
-            ui->messages->append("Message sent ! This contact is busy.");
+            ui->messages->append("Message not sent ! You are busy.");
             break;
         }
         else if (response == RECEIVER_OFFLINE)
@@ -97,16 +97,49 @@ bool CHAT::ProcessString(char symbol, std::string str)
         }
         break;
     }
-    case STATUS_CHANGED:  // need to implement
+    case RCV_MESSAGE:
     {
         str.erase(0, 1);
+        QString sender_and_msg = QString::fromUtf8(str.c_str());
+        QStringList sender_and_msg_splitted = sender_and_msg.split(DELIMITER);
+
+        dlg->Clear();
+        dlg->SetTitleAndText(sender_and_msg_splitted.at(0), sender_and_msg_splitted.at(1));
+        dlg->show();
+
+        moveToThread(QApplication::instance()->thread());
+        QMetaObject::invokeMethod(timer, "start", Qt::QueuedConnection);
 
         break;
     }
-    case REFRESH_CONTACTS: // need to implement
+    case BROADCAST_MESSAGE:
     {
-        str.erase(0, 1);
-
+        std::string response;
+        response.push_back(str[0]);
+        response.push_back(str[1]);
+#ifdef QT_DEBUG
+        std::cout << response << std::endl;
+#endif
+        if (response == BROADCAST_MESSAGE_SENT)
+        {
+            QString data = QString::fromUtf8(str.c_str());
+            QString receivers = ui->Companion->text();
+            QStringList data_list = data.split(DELIMITER);
+            QStringList receivers_list = receivers.split(',');
+            for (std::int32_t i(0); i < receivers_list.size(); ++i)
+            {
+                if(data_list.at(i + 1) == '0')
+                {
+                    QString temp_str = "Message not sent ! Contact " + static_cast<QString>("[ ") + static_cast<QString>(receivers_list.at(i)) + static_cast<QString>(" ]") + static_cast<QString>(" is offline.");
+                    ui->messages->append(temp_str);
+                }
+                else if(data_list.at(i + 1) == '1')
+                {
+                    QString temp_str = "Message sent successfully to contact " + static_cast<QString>("[ ") + static_cast<QString>(receivers_list.at(i)) + static_cast<QString>(" ] .");
+                    ui->messages->append(temp_str);
+                }
+            }
+        }
         break;
     }
     default:
@@ -120,25 +153,10 @@ bool CHAT::ProcessString(char symbol, std::string str)
     return true;
 }
 
-void CHAT::ProcessStringMsg(std::string str)
-{
-    str.erase(0, 1);
-    QString sender_and_msg = QString::fromUtf8(str.c_str());
-    QStringList sender_and_msg_splitted = sender_and_msg.split(DELIMITER);
-    QTimer * timer = new QTimer(this);
-    timer->setInterval(5000);
-    MessagesDlg * dlg = new MessagesDlg;
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->SetTitleAndText(sender_and_msg_splitted.at(0), sender_and_msg_splitted.at(1));
-    connect(timer, SIGNAL(timeout()), dlg, SLOT(close()));
-    dlg->show();
-    timer->start();
-}
-
 void CHAT::CLIENT_THREAD()
 {
 #ifdef QT_DEBUG
-    std::cout << "Thread1 created" << std::endl;
+    std::cout << "Thread created" << std::endl;
 #endif
     std::string str;
     bool p = true;
@@ -146,37 +164,25 @@ void CHAT::CLIENT_THREAD()
     {
         if (!client_ptr->GetString(str))
             break;
-        if (static_cast<char>(str[0]) != RCV_MESSAGE)
-        {
-            if (!ProcessString(static_cast<char>(str[0]), str))
-                break;
-        }
+
+        if (!ProcessString(static_cast<char>(str[0]), str))
+            break;
     }
 #ifdef QT_DEBUG
     std::cerr << "Lost connection to the server.\n";
 #endif
 }
 
-void CHAT::CLIENT_THREAD_MSG()
+void CHAT::CREATE_DLG()
 {
-#ifdef QT_DEBUG
-    std::cout << "Thread2 created" << std::endl;
-#endif
-    std::string str;
-    bool p = true;
-    while (p)
-    {
-        if (!client_ptr->GetString(str))
-            break;
+    dlg = new MessagesDlg(this);
+}
 
-        if (static_cast<char>(str[0]) == RCV_MESSAGE)
-        {
-            ProcessStringMsg(str);
-        }
-    }
-#ifdef QT_DEBUG
-    std::cerr << "Lost connection to the server.\n";
-#endif
+void CHAT::CREATE_TIMER()
+{
+    timer = new QTimer(this);
+    timer->setInterval(3000);
+    connect(timer, SIGNAL(timeout()), dlg, SLOT(close()));
 }
 
 void CHAT::SetNameAndPass(const std::string& username, const std::string& password)
@@ -187,36 +193,23 @@ void CHAT::SetNameAndPass(const std::string& username, const std::string& passwo
     ui->NickName->setText(NickName);
 }
 
+void CHAT::on_AllContacts_itemClicked(QListWidgetItem * item)
+{
+    QString companion_name_and_state = item->text();
+    QStringList companion = companion_name_and_state.split(END_OF_STR);
+    ui->Companion->setText(companion.at(0));
+}
 
 void CHAT::on_GetContactList_clicked()
 {
     std::string get_list = RCV_CONTACT_LIST + username_;
     client_ptr->SendString(get_list);
-    ui->AddContact->setEnabled(false);
-}
-
-void CHAT::on_AddContact_clicked()
-{
-    QList<QListWidgetItem *> check = ui->MyContactList->findItems(ui->AllContacts->currentItem()->text(), Qt::MatchContains);
-    if (check.count() < 1)
-    {
-        ui->MyContactList->addItem(ui->AllContacts->currentItem()->text());
-    }
-    ui->AllContacts->clearSelection();
-    ui->AddContact->setEnabled(false);
-}
-
-void CHAT::on_AllContacts_clicked(const QModelIndex&)
-{
-    ui->AddContact->setEnabled(true);
 }
 
 void CHAT::on_ChangeState_clicked()
 {
     ui->AllContacts->clearSelection();
-    ui->AddContact->setEnabled(false);
 
-    ui->MyContactList->clearSelection();
     ui->Companion->setText("Companion");
 
     QString status = ui->Status->currentText();
@@ -239,42 +232,63 @@ void CHAT::on_ChangeState_clicked()
 void CHAT::on_Refresh_clicked()
 {
     ui->AllContacts->clearSelection();
-    ui->AddContact->setEnabled(false);
 
-    ui->MyContactList->clearSelection();
     ui->Companion->setText("Companion");
 
-    std::string refresh = REFRESH_CONTACTS + username_;
+    std::string refresh = RCV_CONTACT_LIST + username_;
     client_ptr->SendString(refresh);
-}
-
-void CHAT::on_MyContactList_itemClicked(QListWidgetItem * item)
-{
-    QString companion_name_and_state = item->text();
-    QStringList companion = companion_name_and_state.split(END_OF_STR);
-    ui->Companion->setText(companion.at(0));
 }
 
 void CHAT::on_SEND_clicked()
 {
-    ui->AllContacts->clearSelection();
-    ui->AddContact->setEnabled(false);
     if(ui->Status->currentText() != "OFFLINE")
     {
-        if (ui->Companion->text() != "Companion")
+        if(ui->Status->currentText() != "BUSY")
         {
-            if (ui->msg->text() != "")
+            if (ui->Companion->text() != "Companion")
             {
-                QString NickName = QString::fromUtf8(username_.c_str());
-                QString msg = MESSAGE + NickName + DELIMITER + ui->Companion->text() + DELIMITER + ui->msg->text();
-                std::string converted_msg = msg.toUtf8().constData();
-                client_ptr->SendString(converted_msg);
-                ui->msg->clear();
+                if (ui->msg->text() != "")
+                {
+                    if(ui->AllContacts->selectedItems().size() > 1)
+                    {
+                        QString data = BROADCAST_MESSAGE + ui->NickName->text() + DELIMITER + QString::number(ui->AllContacts->selectedItems().size()) + DELIMITER;
+                        QString receivers;
+                        QList<QListWidgetItem*> selected_contacts = ui->AllContacts->selectedItems();
+                        foreach (QListWidgetItem* contact, selected_contacts)
+                        {
+                            QString companion_name_and_state = contact->text();
+                            QStringList companion = companion_name_and_state.split(END_OF_STR);
+                            data += companion.at(0) + DELIMITER;
+                            receivers += companion.at(0) + ',';
+                        }
+                        data += ui->msg->text();
+                        receivers.resize(receivers.size() - 1);
+                        ui->Companion->setText(receivers);
+                        std::string converted_data = data.toUtf8().constData();
+#ifdef QT_DEBUG
+                        std::cout << converted_data << std::endl;
+#endif
+                        client_ptr->SendString(converted_data);
+                        ui->msg->clear();
+                    }
+                    else
+                    {
+                        QString NickName = QString::fromUtf8(username_.c_str());
+                        QString msg = MESSAGE + NickName + DELIMITER + ui->Companion->text() + DELIMITER + ui->msg->text();
+                        std::string converted_msg = msg.toUtf8().constData();
+                        client_ptr->SendString(converted_msg);
+                        ui->msg->clear();
+                    }
+                }
+            }
+            else
+            {
+                QMessageBox::information(this, "Info", "Please select the recipient !");
             }
         }
         else
         {
-            QMessageBox::information(this, "Info", "Please select the recipient !");
+            QMessageBox::information(this, "Info", "You cannot send a message when you are BUSY !");
         }
     }
     else

@@ -10,6 +10,7 @@ MessagesDlg::MessagesDlg(QWidget *parent) : QDialog(parent), ui(new Ui::Messages
     ui->setupUi(this);
 
     this->move(QApplication::desktop()->screen()->rect().topRight() - this->rect().topRight());
+
 }
 
 MessagesDlg::~MessagesDlg()
@@ -24,4 +25,10 @@ void MessagesDlg::SetTitleAndText(const QString& title, const QString& text)
 {
     this->setWindowTitle(title);
     ui->TEXT->setText(text);
+}
+
+void MessagesDlg::Clear()
+{
+    this->setWindowTitle("");
+    ui->TEXT->setText("");
 }

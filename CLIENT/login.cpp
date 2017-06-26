@@ -70,6 +70,8 @@ void LogIn::on_START_clicked()
                 if (response == SUCCESS_LOGIN)
                 {
                     hide();
+                    ch->CREATE_DLG();
+                    ch->CREATE_TIMER();
                     ch->THREAD_CREATE();
                     flag_thread_ = true;
                     ch->SetNameAndPass(login, password);
@@ -120,10 +122,14 @@ void LogIn::on_CreateAnAcc_clicked()
         {
             if(client_ptr->GetString(response))
             {
+#ifdef QT_DEBUG
                 std::cout << response << std::endl;
+#endif
                 if (response == SUCCESS_CREATION_ACC)
                 {
                     hide();
+                    ch->CREATE_DLG();
+                    ch->CREATE_TIMER();
                     ch->THREAD_CREATE();
                     flag_thread_ = true;
                     ch->SetNameAndPass(username, password);

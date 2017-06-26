@@ -31,8 +31,8 @@ private slots:
 
 private:
 
-    Ui::LogIn *ui;
-    CHAT *ch;
+    Ui::LogIn * ui;
+    CHAT * ch;
 
     bool flag_thread_ = false;
 };

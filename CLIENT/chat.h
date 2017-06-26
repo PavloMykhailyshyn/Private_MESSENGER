@@ -5,7 +5,6 @@
 #include <QDesktopWidget>
 #include <QListWidget>
 #include <QMessageBox>
-#include <QDebug>
 #include <QTimer>
 #include <sstream>
 #include <boost/thread.hpp>
@@ -31,39 +30,39 @@ public:
     void THREAD_CREATE();
     void THREAD_DELETE();
 
+    void CREATE_DLG();
+    void CREATE_TIMER();
+
     void SetNameAndPass(const std::string&, const std::string&);
 
 private slots:
 
     void on_GetContactList_clicked();
 
-    void on_AddContact_clicked();
-
-    void on_AllContacts_clicked(const QModelIndex&);
-
     void on_ChangeState_clicked();
 
     void on_Refresh_clicked();
 
-    void on_MyContactList_itemClicked(QListWidgetItem*);
-
     void on_SEND_clicked();
+
+    void on_AllContacts_itemClicked(QListWidgetItem*);
 
 private:
 
-    Ui::CHAT *ui;
+    Ui::CHAT * ui;
 
-    boost::thread * thread1_;
-    boost::thread * thread2_;
+    boost::thread * thread_;
 
     std::string username_;
     std::string password_;
+
+    MessagesDlg * dlg;
+    QTimer * timer;
 
     void CLIENT_THREAD();
     void CLIENT_THREAD_MSG();
 
     bool ProcessString(char, std::string);
-    void ProcessStringMsg(std::string);
 
 };
 

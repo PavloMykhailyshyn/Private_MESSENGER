@@ -1,8 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define IP_ADDRESS       /*"172.20.8.135"*/         "127.0.0.1"               // server ip
-#define PORT                      /*4547 */         1111                      // communication port
+#define IP_ADDRESS          "172.20.8.135"               // server ip
+#define PORT                          1111               // communication port
 
 #define DELIMITER                       '#'
 #define END_OF_STR                      '\n'
@@ -18,6 +18,7 @@
 #define RECEIVER_OFFLINE                "40"
 #define RCV_MESSAGE                     '5'
 #define STATUS_CHANGED                  '6'
-#define REFRESH_CONTACTS                '7'
+#define BROADCAST_MESSAGE               '7'
+#define BROADCAST_MESSAGE_SENT          "71"
 
 #endif // COMMON_H

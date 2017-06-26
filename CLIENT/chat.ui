@@ -99,21 +99,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QPushButton" name="AddContact">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>add contact</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QVBoxLayout" name="verticalLayout_3"/>
          </item>
          <item>
           <widget class="QPushButton" name="GetContactList">
@@ -143,16 +129,6 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>MY CONTACTS</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>ALL CONTACTS</string>
@@ -173,23 +149,6 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QListWidget" name="MyContactList">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_5">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QListWidget" name="AllContacts"/>
          </item>
@@ -276,7 +235,11 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLineEdit" name="msg"/>
+          <widget class="QLineEdit" name="msg">
+           <property name="placeholderText">
+            <string>Message...</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="SEND">
